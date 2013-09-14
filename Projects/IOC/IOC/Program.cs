@@ -23,6 +23,7 @@ namespace IOC
                 }
                 catch (Exception e)
                 {
+                    //Lazy mans way of handling wrong input and exiting
                     Console.WriteLine("Invalid Value: " + e.GetType() + " Thrown");
                     Console.WriteLine("Exiting...");
                     break;
@@ -40,6 +41,7 @@ namespace IOC
     }
     public class Calculator : ICalculator
     {
+        
         readonly List<IOperation> _operations = new List<IOperation>();
         public Calculator(Subtraction sub, Addition add)
         {
@@ -69,7 +71,6 @@ namespace IOC
     public interface IOperation
     {
         string GetName();
-        void GetValues();
         int DoSomething();
     }
     public class Addition : IOperation
@@ -80,7 +81,7 @@ namespace IOC
         {
             return "Addition";
         }
-        public void GetValues()
+        private void GetValues()
         {
             Console.Write("Input Values: ");
             _val1 = Convert.ToInt32(Console.ReadLine());
@@ -101,7 +102,7 @@ namespace IOC
             return "Subtration";
         }
 
-        public void GetValues()
+        private void GetValues()
         {
             Console.Write("Input Values: ");
             _val1 = Convert.ToInt32(Console.ReadLine());
