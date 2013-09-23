@@ -1,0 +1,4 @@
+﻿class Type
+struct Type
+if ControlStructure
+while ControlStructure

@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using HighLighter;
 using Microsoft.Practices.Unity;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SyntaxHighlighter;
 
 namespace TestSuite
 {
@@ -12,6 +12,7 @@ namespace TestSuite
     public class LexerTest
     { 
         IUnityContainer container = new UnityContainer();
+
         [TestMethod]
         public void LexerTest_LexBasic_ReturnCorrectToken()
         {
@@ -21,16 +22,40 @@ namespace TestSuite
 
             var lexer = container.Resolve<ILexer>();
 
+            lexer.CreateLexerMap("TestStringToTokenMap.txt");
+
             var tokenTypes = lexer.Tokenize(input);
 
-            StringBuilder stringBuilder = new StringBuilder();
+            var stringBuilder = new StringBuilder();
 
             foreach (var token in tokenTypes)
             {
                 stringBuilder.Append(token.Type + ",");
             }
-            Assert.AreEqual(stringBuilder.ToString(), "ProgramStructure,Null,");
+            Assert.AreEqual("Type,Basic,",stringBuilder.ToString());
             
+        }
+
+        [TestMethod]
+        public void LexerTest_ConstructFromText_CreatesValidMap()
+        {
+            container.RegisterType<ILexer, Lexer>();
+
+            var input = "class struct while if boobs";
+
+            var lexer = container.Resolve<ILexer>();
+
+            lexer.CreateLexerMap("TestStringToTokenMap.txt");
+
+            var tokenTypes = lexer.Tokenize(input);
+
+            var stringBuilder = new StringBuilder();
+
+            foreach (var token in tokenTypes)
+            {
+                stringBuilder.Append(token.Type + ",");
+            }
+            Assert.AreEqual("Type,Type,ControlStructure,ControlStructure,Null,",stringBuilder.ToString());
         }
     }
 }

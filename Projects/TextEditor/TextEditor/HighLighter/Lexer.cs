@@ -1,21 +1,55 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
 
-namespace SyntaxHighlighter
+namespace HighLighter
 {
     public interface ILexer
     {
         void AddDefinition(String value,Token token);
+        void CreateLexerMap(String fileName);
         IEnumerable<Token> Tokenize(string source);
     }
     public class Lexer : ILexer
     {   
         readonly Dictionary<String,Token> _tokenDefinitionDictionary = new Dictionary<String,Token>();
 
+        readonly List<Token> _tokens = new List<Token>();
+
         public Lexer()
         {
-            _tokenDefinitionDictionary.Add("class", new Token {Type = SyntaxTokenType.ProgramStructure});
+        }
+
+        public void CreateLexerMap(String fileName)
+        {
+            var file = new StreamReader(fileName);
+            var sb = new StringBuilder();
+            string line;
+            
+
+            while ((line = file.ReadLine())!=null)
+            {
+                var key = " ";
+                line += " ";
+                foreach (var c in line.ToCharArray())
+                {
+                    if (c == ' ' && sb.Length > 0)
+                    {
+                        if (key == " ")
+                        {
+                            key = sb.ToString();
+                            sb.Length = 0;
+                            continue;
+                        }
+                        _tokenDefinitionDictionary.Add(key,
+                            new Token {Type = TokenMap.MapStringtoTokenType(sb.ToString())});
+                        sb.Length = 0;
+                    }
+                    if(c!= ' ') sb.Append(c);
+                }
+            }
         }
 
         public void AddDefinition(String value, Token token)
@@ -26,7 +60,6 @@ namespace SyntaxHighlighter
         public IEnumerable<Token> Tokenize(String source)
         {
             source += " ";
-            var tokens = new List<Token>();
             var currentIndex = 0;
             var currentWordStart = 0;
             var currentWordEnd = 0;
@@ -39,7 +72,7 @@ namespace SyntaxHighlighter
                 {
                     if (stringBuilder.Length > 0)
                     {
-                        tokens.Add(
+                        _tokens.Add(
                             convertStringToToken(
                                 stringBuilder.ToString(),
                                 new TokenPosition
@@ -60,7 +93,7 @@ namespace SyntaxHighlighter
                 currentWordEnd++;
                 currentIndex++;
             }
-            return tokens;
+            return _tokens;
         }
 
         Token convertStringToToken(string text,TokenPosition position)
@@ -72,6 +105,15 @@ namespace SyntaxHighlighter
                     IsIgnored = false,
                     Position = position
                 };
+            if (_tokens.Last().Type == SyntaxTokenType.Type)
+            {
+                return new Token
+                {
+                    Type = SyntaxTokenType.Basic,
+                    IsIgnored = false,
+                    Position = position,
+                };
+            }
             return new Token
             {
                 Type = SyntaxTokenType.Null,
