@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using AHM.Core;
 
-namespace Relay.Core
+namespace Module.Core
 {
-    public interface IAbstractRelay
+    public interface IAbstractModule
     {
-        ValidationResults GetData();
+        IEnumerable<IOperation> OperationList { get; set; }
     }
 }
