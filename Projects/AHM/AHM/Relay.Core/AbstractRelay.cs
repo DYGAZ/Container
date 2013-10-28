@@ -9,6 +9,8 @@ namespace Relay.Core
 {
     public interface IAbstractRelay
     {
-        ValidationResults GetData();
+        Tier RelayTier { get; set; }
+        ValidationResults ValidationResults { get; set; }
+        void GetData();
     }
 }
