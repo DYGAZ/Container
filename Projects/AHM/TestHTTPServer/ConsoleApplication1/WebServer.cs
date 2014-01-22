@@ -3,6 +3,9 @@ using System.Net;
 using System.Threading;
 using System.Linq;
 using System.Text;
+using System.Web;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace ConsoleApplication1
 {
@@ -88,8 +91,17 @@ namespace ConsoleApplication1
 
         public static string SendResponse(HttpListenerRequest request)
         {
-            string testData = "<HTML><BODY>My web page.<br></BODY></HTML>";
-            return string.Format(testData);
+            var xml = new XElement("arduino",
+                new XAttribute("name", "Arduino1"),
+                    new XElement("sensor",
+                        new XAttribute("name", "sensor1"),
+                        new XAttribute("value", 1.567)),
+                    new XElement("sensor",
+                        new XAttribute("name", "sensor2"),
+                        new XAttribute("value", 5.43))
+                );
+            //string testData = "<arduino><sensor>1.50</sensor><sensor>4.23</sensor></arduino>";
+            return string.Format(xml.ToString());
         }
     }
 
